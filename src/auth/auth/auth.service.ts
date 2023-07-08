@@ -1,21 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UserType } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
+import { loginParams, registerParams } from '../interfaces/auth.interface';
+import { UserResponseDto } from '../dtos/auth.dto';
 
-import { UserResponseDto } from '../dtos/userrespone.dto';
-interface registerParams {
-  email: string;
-  password: string;
-  name: string;
-  user_type?: UserType;
-}
-
-interface loginParams {
-  email: string;
-  password: string;
-}
 @Injectable()
 export class AuthService {
   constructor(private readonly prismaService: PrismaService) {}

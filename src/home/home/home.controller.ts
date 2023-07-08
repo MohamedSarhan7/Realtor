@@ -1,6 +1,16 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { PropertyType } from '@prisma/client';
 import { HomeService } from './home.service';
+import { User } from 'src/auth/decorators/user.decorator';
+import { UserInfoAuth } from 'src/auth/interfaces/auth.interface';
 
 @Controller('home')
 export class HomeController {
@@ -42,5 +52,10 @@ export class HomeController {
   @Get(':id')
   getOneHome(@Param('id', ParseIntPipe) id: number) {
     return this.homeService.getHomeById(id);
+  }
+
+  @Post()
+  createHome(@Body() body: any, @User() user: UserInfoAuth) {
+    return user;
   }
 }
