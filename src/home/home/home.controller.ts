@@ -1,9 +1,12 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -11,6 +14,7 @@ import { PropertyType } from '@prisma/client';
 import { HomeService } from './home.service';
 import { User } from 'src/auth/decorators/user.decorator';
 import { UserInfoAuth } from 'src/auth/interfaces/auth.interface';
+import { HomeDto } from '../dtos/home.dto';
 
 @Controller('home')
 export class HomeController {
@@ -55,7 +59,23 @@ export class HomeController {
   }
 
   @Post()
-  createHome(@Body() body: any, @User() user: UserInfoAuth) {
-    return user;
+  createHome(@Body() home: HomeDto, @User() user: UserInfoAuth) {
+    return this.homeService.createHome(home, user);
+  }
+
+  @Patch(':id')
+  updateHome(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() home: Partial<HomeDto>,
+  ) {
+    if (Object.keys(home).length === 0) {
+      throw new BadRequestException('Request body cannot be empty');
+    }
+    return this.homeService.partialUpdateHome(id, home);
+  }
+
+  @Delete(':id')
+  deleteHomeById(@Param('id', ParseIntPipe) id: number) {
+    return this.homeService.deleteHome(id);
   }
 }

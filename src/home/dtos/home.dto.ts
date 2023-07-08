@@ -1,6 +1,41 @@
 import { PropertyType } from '@prisma/client';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 
-export class HomeDto {}
+export class HomeDto {
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
+  @IsNumber()
+  @IsPositive()
+  number_of_bedrooms: number;
+
+  @IsNumber()
+  @IsPositive()
+  number_of_bathrooms: number;
+
+  @IsString()
+  @IsNotEmpty()
+  city: string;
+
+  @IsNumber()
+  @IsPositive()
+  price: number;
+
+  @IsNumber()
+  @IsPositive()
+  land_size: number;
+
+  @IsEnum(PropertyType)
+  propertyType: PropertyType;
+}
+
 export class HomeResponseDto {
   id: number;
   address: string;

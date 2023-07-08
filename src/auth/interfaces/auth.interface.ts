@@ -7,6 +7,7 @@ export interface UserInfoAuth {
   iat: number;
   exp: number;
 }
+
 export interface registerParams {
   email: string;
   password: string;
