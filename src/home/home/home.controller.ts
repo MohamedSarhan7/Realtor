@@ -15,7 +15,9 @@ import { HomeService } from './home.service';
 import { User } from 'src/auth/decorators/user.decorator';
 import { UserInfoAuth } from 'src/auth/interfaces/auth.interface';
 import { HomeDto } from '../dtos/home.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Home')
 @Controller('home')
 export class HomeController {
   constructor(private readonly homeService: HomeService) {}

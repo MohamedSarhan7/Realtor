@@ -22,7 +22,6 @@ async function bootstrap() {
     .setTitle('Reaeltor App')
     .setDescription('The Reaeltor App API description')
     .setVersion('1.0')
-    .addTag('Reaeltor App')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
