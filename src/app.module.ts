@@ -12,13 +12,13 @@ import { AuthInterceptor } from './auth/interceptor/auth.interceptor';
   controllers: [AppController],
   providers: [
     AppService,
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: AuthInterceptor,
+    // },
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: AuthInterceptor,
     },
   ],
 })

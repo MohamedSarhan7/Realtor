@@ -9,15 +9,20 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
-import { PropertyType } from '@prisma/client';
+import { PropertyType, UserType } from '@prisma/client';
 import { HomeService } from './home.service';
 import { User } from 'src/auth/decorators/user.decorator';
 import { UserInfoAuth } from 'src/auth/interfaces/auth.interface';
 import { HomeDto } from '../dtos/home.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthGurd } from 'src/guards/auth.guard';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @ApiTags('Home')
+@UseGuards(AuthGurd)
 @Controller('home')
 export class HomeController {
   constructor(private readonly homeService: HomeService) {}
@@ -60,11 +65,16 @@ export class HomeController {
     return this.homeService.getHomeById(id);
   }
 
+  @Roles(UserType.REALTOR, UserType.ADMIN)
   @Post()
-  createHome(@Body() home: HomeDto, @User() user: UserInfoAuth) {
-    return this.homeService.createHome(home, user);
+  createHome(@Req() req, @Body() home: HomeDto, @User() user: UserInfoAuth) {
+    console.log('controller: ', user);
+    console.log('req.user: ', req?.user);
+    // return this.homeService.createHome(home, user);
+    return 'done';
   }
 
+  @Roles(UserType.REALTOR, UserType.ADMIN)
   @Patch(':id')
   updateHome(
     @Param('id', ParseIntPipe) id: number,
@@ -76,6 +86,7 @@ export class HomeController {
     return this.homeService.partialUpdateHome(id, home);
   }
 
+  @Roles(UserType.REALTOR, UserType.ADMIN)
   @Delete(':id')
   deleteHomeById(@Param('id', ParseIntPipe) id: number) {
     return this.homeService.deleteHome(id);

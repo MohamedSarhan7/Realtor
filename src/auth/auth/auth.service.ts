@@ -4,6 +4,7 @@ import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { loginParams, registerParams } from '../interfaces/auth.interface';
 import { UserResponseDto } from '../dtos/auth.dto';
+import { UserType } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +22,12 @@ export class AuthService {
         password: hashedPaswword,
       },
     });
-    const token = this.genrateJwtToken(newUser.id, newUser.email, newUser.name);
+    const token = this.genrateJwtToken(
+      newUser.id,
+      newUser.email,
+      newUser.name,
+      newUser.user_type,
+    );
 
     return new UserResponseDto({
       ...newUser,
@@ -37,19 +43,30 @@ export class AuthService {
     const isValidPassword = await bcrypt.compare(body.password, user.password);
     if (!isValidPassword)
       throw new BadRequestException('Invalid cerdintioals!');
-    const token = this.genrateJwtToken(user.id, user.email, user.name);
+    const token = this.genrateJwtToken(
+      user.id,
+      user.email,
+      user.name,
+      user.user_type,
+    );
     return new UserResponseDto({
       ...user,
       token: { key: token, expiresIn: process.env.JWT_EXPIRES_IN },
     });
   }
 
-  private genrateJwtToken(id: number, email: string, name: string) {
+  private genrateJwtToken(
+    id: number,
+    email: string,
+    name: string,
+    user_type: UserType,
+  ) {
     return jwt.sign(
       {
         id,
         name,
         email,
+        user_type,
       },
       process.env.JWT_TOKEN_KEY,
       {
