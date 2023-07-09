@@ -21,28 +21,31 @@ interface JWTPayload {
 export class AuthGurd implements CanActivate {
   constructor(private readonly reflctor: Reflector) {}
   async canActivate(context: ExecutionContext) {
-    // get user from token
-    const request = context.switchToHttp().getRequest();
-    const token = request?.headers?.authorization?.split('Bearer ')[1];
-    const user = (await jwt.verify(
-      token,
-      process.env.JWT_TOKEN_KEY,
-    )) as JWTPayload;
+    try {
+      // get user from token
+      const request = context.switchToHttp().getRequest();
+      const token = request?.headers?.authorization?.split('Bearer ')[1];
+      if (!token) throw new UnauthorizedException();
+      const user = jwt.verify(token, process.env.JWT_TOKEN_KEY) as JWTPayload;
+      if (!user) throw new UnauthorizedException();
 
-    if (!user) throw new UnauthorizedException();
+      // add decoded user to request
+      request.user = user;
 
-    // add decoded user to request
-    request.user = user;
+      // get roles
+      const roles = this.reflctor.getAllAndOverride('roles', [
+        context.getHandler(),
+        context.getClass(),
+      ]);
 
-    // get roles
-    const roles = this.reflctor.getAllAndOverride('roles', [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+      if (!roles) return true;
 
-    if (!roles) return true;
-
-    // match user.user_type with roles if roles exist
-    return roles.includes(user.user_type);
+      // match user.user_type with roles if roles exist
+      return roles.includes(user.user_type);
+    } catch (error) {
+      if (error instanceof jwt.TokenExpiredError) {
+        throw new UnauthorizedException('token expired');
+      }
+    }
   }
 }

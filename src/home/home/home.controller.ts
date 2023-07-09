@@ -9,14 +9,13 @@ import {
   Patch,
   Post,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { PropertyType, UserType } from '@prisma/client';
 import { HomeService } from './home.service';
 import { User } from 'src/auth/decorators/user.decorator';
 import { UserInfoAuth } from 'src/auth/interfaces/auth.interface';
-import { HomeDto } from '../dtos/home.dto';
+import { HomeDto, MessageDto } from '../dtos/home.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGurd } from 'src/guards/auth.guard';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -67,11 +66,8 @@ export class HomeController {
 
   @Roles(UserType.REALTOR, UserType.ADMIN)
   @Post()
-  createHome(@Req() req, @Body() home: HomeDto, @User() user: UserInfoAuth) {
-    console.log('controller: ', user);
-    console.log('req.user: ', req?.user);
-    // return this.homeService.createHome(home, user);
-    return 'done';
+  createHome(@Body() home: HomeDto, @User() user: UserInfoAuth) {
+    return this.homeService.createHome(home, user);
   }
 
   @Roles(UserType.REALTOR, UserType.ADMIN)
@@ -90,5 +86,21 @@ export class HomeController {
   @Delete(':id')
   deleteHomeById(@Param('id', ParseIntPipe) id: number) {
     return this.homeService.deleteHome(id);
+  }
+
+  @Roles(UserType.BUYER)
+  @Post(':id/inqure')
+  inqureHome(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() message: MessageDto,
+    @User() buyer: UserInfoAuth,
+  ) {
+    return this.homeService.inqureHome(id, message, buyer);
+  }
+
+  @Roles(UserType.REALTOR)
+  @Get(':id/messages')
+  getHomeMessages(@Param('id', ParseIntPipe) id: number) {
+    return this.homeService.getHomeMessages(id);
   }
 }

@@ -70,7 +70,7 @@ export class AuthService {
       },
       process.env.JWT_TOKEN_KEY,
       {
-        expiresIn: process.env.JWT_EXPIRES_IN,
+        expiresIn: `${process.env.JWT_EXPIRES_IN}s`,
       },
     );
   }

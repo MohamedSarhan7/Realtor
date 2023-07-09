@@ -53,3 +53,8 @@ export class HomeResponseDto {
     Object.assign(this, parital);
   }
 }
+export class MessageDto {
+  @IsString()
+  @IsNotEmpty()
+  message: string;
+}

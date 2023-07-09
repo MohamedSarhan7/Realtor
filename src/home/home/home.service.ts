@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PropertyType } from '@prisma/client';
 import { UserInfoAuth } from 'src/auth/interfaces/auth.interface';
-import { HomeDto, HomeResponseDto } from 'src/home/dtos/home.dto';
+import { HomeDto, HomeResponseDto, MessageDto } from 'src/home/dtos/home.dto';
 import { PrismaService } from 'src/prisma/prisma/prisma.service';
 
 interface getHomesFilterParams {
@@ -75,5 +75,30 @@ export class HomeService {
     });
     if (!home) throw new NotFoundException("can't find home this is id");
     return await this.prismaService.home.delete({ where: { id } });
+  }
+
+  async inqureHome(home_id: number, message: MessageDto, buyer: UserInfoAuth) {
+    const home = await this.prismaService.home.findUnique({
+      where: { id: home_id },
+    });
+    if (!home) throw new NotFoundException('cant find home with this id');
+
+    const InqureMessage = await this.prismaService.message.create({
+      data: {
+        ...message,
+        home_id: home_id,
+        buyer_id: buyer.id,
+        realtor_id: home.realtor_id,
+      },
+    });
+    return InqureMessage;
+  }
+
+  async getHomeMessages(id: number) {
+    const messages = this.prismaService.message.findMany({
+      where: { home_id: id },
+      include: { buyer: { select: { name: true, email: true } } },
+    });
+    return messages;
   }
 }
